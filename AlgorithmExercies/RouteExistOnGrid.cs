@@ -1,7 +1,6 @@
 ﻿using System.Transactions;
 
 namespace ConsoleAppAlgorithmsExamples.AlgorithmExercises;
-
 internal class RouteExistOnGrid
 {
     /// T T F
