@@ -1,20 +1,20 @@
-﻿using ConsoleAppAlgorithmsExamples.AlgorithmExercises;
-using ConsoleAppAlgorithmsExamples.Interfaces;
+﻿using System.Text.RegularExpressions;
 
 namespace ConsoleAppAlgorithmsExamples
 {
-    internal class Program
+    internal partial class Program
     {
+        //Our regex: "^\d{4}-\d{2}-\d{2}$"
+        [GeneratedRegex(@"^\d{4}-\d{2}-\d{2}$")]
+        private static partial Regex DateRegex();
         static void Main(string[] args)
         {
-            List<ITest> tests = [new CycleDetectorTest(), new RouteExistOnGridTest(), new RouteExistOnGridDFSTest(), new TrainCompositionTest()];
-            tests.ForEach(t => {
+            var testValue1 = "2025-10-03"; //true
+            var testValue2 = "03/10/2025"; //false
 
-                Console.WriteLine($"[TEST] {nameof(t)} started");
-                t.Execute();
-                Console.WriteLine($"[ENDTEST] {nameof(t)} started"); 
-                Console.WriteLine(); 
-            });
+
+            Console.WriteLine(DateRegex().IsMatch("2025-10-03")); // true
+            Console.WriteLine(DateRegex().IsMatch("03/10/2025")); // false
         }
     }
 }
