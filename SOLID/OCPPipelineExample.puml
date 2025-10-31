@@ -1,0 +1,14 @@
+@startuml
+interface IMeasurementSource
+interface IMeasurementProcessor
+component "Pipeline" as P
+component "UltrasonicSource" as US
+component "BleSource" as BLE
+component "Processor" as PR
+
+IMeasurementSource <|.. US
+IMeasurementSource <|.. BLE
+IMeasurementProcessor <|.. PR
+P --> IMeasurementSource : enumerate
+P --> IMeasurementProcessor : process(Measurement)
+@enduml

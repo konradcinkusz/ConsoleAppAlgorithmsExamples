@@ -2,6 +2,155 @@
 
 namespace ConsoleAppAlgorithmsExamples.Models;
 
+// Step 1: Bare-bones dynamic array (no interfaces, no resizing yet)
+public class MyListStep1<T>
+{
+    private const int DefaultCapacity = 4;
+
+    private T[] _items;
+    private int _count;
+
+    public MyListStep1()
+    {
+        _items = new T[DefaultCapacity]; // fixed buffer for now
+        _count = 0;
+    }
+
+    public int Count => _count;
+
+    // Naive Add: throws when full (we'll add resizing in Step 2)
+    public void Add(T item)
+    {
+        if (_count == _items.Length)
+            throw new InvalidOperationException("Capacity reached. Resizing not implemented yet.");
+
+        _items[_count++] = item;
+    }
+}
+
+// Step 2: Add resizing support and capacity constructor
+public class MyListStep2<T>
+{
+    private const int DefaultCapacity = 4;
+
+    private T[] _items;
+    private int _count;
+
+    public MyListStep2()
+    {
+        _items = Array.Empty<T>(); // start empty; grow on first Add
+    }
+
+    public MyListStep2(int capacity)
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException(nameof(capacity));
+        _items = capacity == 0 ? Array.Empty<T>() : new T[capacity];
+    }
+
+    public int Count => _count;
+
+    public void Add(T item)
+    {
+        EnsureCapacity(_count + 1);
+        _items[_count++] = item;
+    }
+
+    // Private helper: doubles capacity (or sets to default) as needed
+    private void EnsureCapacity(int min)
+    {
+        if (_items.Length >= min) return;
+
+        int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
+        if (newCapacity < min) newCapacity = min;
+
+        var newArr = new T[newCapacity];
+        if (_count > 0)
+            Array.Copy(_items, 0, newArr, 0, _count);
+
+        _items = newArr;
+    }
+}
+
+// Step 3: Add indexer, RemoveAt, and Clear (still interface-free)
+public class MyListStep3<T>
+{
+    private const int DefaultCapacity = 4;
+
+    private T[] _items;
+    private int _count;
+
+    public MyListStep3()
+    {
+        _items = Array.Empty<T>();
+    }
+
+    public MyListStep3(int capacity)
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException(nameof(capacity));
+        _items = capacity == 0 ? Array.Empty<T>() : new T[capacity];
+    }
+
+    public int Count => _count;
+
+    public T this[int index]
+    {
+        get
+        {
+            if ((uint)index >= (uint)_count) throw new ArgumentOutOfRangeException(nameof(index));
+            return _items[index];
+        }
+        set
+        {
+            if ((uint)index >= (uint)_count) throw new ArgumentOutOfRangeException(nameof(index));
+            _items[index] = value;
+        }
+    }
+
+    public void Add(T item)
+    {
+        EnsureCapacity(_count + 1);
+        _items[_count++] = item;
+    }
+
+    public void RemoveAt(int index)
+    {
+        if ((uint)index >= (uint)_count) throw new ArgumentOutOfRangeException(nameof(index));
+
+        _count--; // one fewer item after removal
+
+        // Shift elements left if not removing the last element
+        if (index < _count)
+        {
+            Array.Copy(_items, index + 1, _items, index, _count - index);
+        }
+
+        // Clear last slot to allow GC of reference types
+        _items[_count] = default!;
+    }
+
+    public void Clear()
+    {
+        if (_count == 0) return;
+
+        Array.Clear(_items, 0, _count);
+        _count = 0;
+    }
+
+    private void EnsureCapacity(int min)
+    {
+        if (_items.Length >= min) return;
+
+        int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
+        if (newCapacity < min) newCapacity = min;
+
+        var newArr = new T[newCapacity];
+        if (_count > 0)
+            Array.Copy(_items, 0, newArr, 0, _count);
+
+        _items = newArr;
+    }
+}
+
 /// <summary>
 /// A minimal dynamic array similar to List<T>, backed by T[].
 /// </summary>

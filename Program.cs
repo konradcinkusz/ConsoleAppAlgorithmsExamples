@@ -9,6 +9,7 @@ namespace ConsoleAppAlgorithmsExamples
         private static partial Regex DateRegex();
         static void Main(string[] args)
         {
+            StringSegmentsDemo.Run();
             var testValue1 = "2025-10-03"; //true
             var testValue2 = "03/10/2025"; //false
 
